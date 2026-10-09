@@ -7,6 +7,7 @@ on:
 
 jobs:
   build:
+    name: Build & Export APK
     runs-on: ubuntu-latest
 
     steps:
@@ -20,13 +21,19 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Make Gradlew Executable
-        run: chmod +x gradlew
+      - name: Prepare Gradle Wrapper
+        run: |
+          sed -i 's/\r$//' gradlew
+          chmod +x gradlew
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Upload APK to Download
+      - name: Verify APK Generated
+        run: |
+          ls -la app/build/outputs/apk/debug/
+
+      - name: Upload Teleprompter Pro APK
         uses: actions/upload-artifact@v4
         with:
           name: Teleprompter-Pro-APK
