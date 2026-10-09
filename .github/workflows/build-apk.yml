@@ -19,19 +19,18 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: gradle
 
-      - name: Prepare Gradle Wrapper
-        run: |
-          sed -i 's/\r$//' gradlew
-          chmod +x gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Accept Android SDK Licenses
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+        run: gradle assembleDebug --no-daemon --stacktrace --warning-mode=all
 
-      - name: Verify APK Generated
-        run: |
-          ls -la app/build/outputs/apk/debug/
+      - name: Verify APK Exists
+        run: ls -lh app/build/outputs/apk/debug/app-debug.apk
 
       - name: Upload Teleprompter Pro APK
         uses: actions/upload-artifact@v4
