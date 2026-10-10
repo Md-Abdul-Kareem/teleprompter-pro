@@ -20,14 +20,38 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Prepare Gradle Wrapper
+        run: |
+          # Fix Windows CRLF line endings if present
+          sed -i 's/\r$//' gradlew
+          chmod +x gradlew
+
+          # Verify the wrapper jar exists and is valid
+          if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            echo "ERROR: gradle-wrapper.jar not found!"
+            exit 1
+          fi
+
+          echo "Wrapper JAR size: $(wc -c < gradle/wrapper/gradle-wrapper.jar) bytes"
+          echo "Wrapper JAR SHA256: $(sha256sum gradle/wrapper/gradle-wrapper.jar)"
+          echo "Gradle version from properties:"
+          cat gradle/wrapper/gradle-wrapper.properties
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: wrapper
+          validate-wrappers: true
 
       - name: Accept Android SDK Licenses
-        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses 2>/dev/null || true
+
+      - name: Install Android SDK Platform 35
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0" 2>/dev/null || true
 
       - name: Build Debug APK
-        run: gradle assembleDebug --no-daemon --stacktrace --warning-mode=all
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Verify APK Exists
         run: ls -lh app/build/outputs/apk/debug/app-debug.apk
