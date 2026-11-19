@@ -13,6 +13,21 @@
 /captures
 .externalNativeBuild
 .cxx
+# Built application binaries
+*.apk
+*.aab
+*.ap_
+
+# Keystores & Signing
+*.jks
+*.keystore
+debug.keystore
+
+# Local configuration & environment
 local.properties
 .env
-debug.keystore
+.env.*
+
+# Logs & temp
+*.log
+*.tmp
