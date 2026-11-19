@@ -46,6 +46,13 @@ flowchart LR
 4. **Install:** Tap **Install** &rarr; **Open**.
 5. Grant Camera and Audio permissions when prompted for video recording, and you're ready to create!
 
+> [!NOTE]
+> ### 🛡️ Why does Android say "File might be harmful" or "Unrecognized app"?
+> If your phone shows a security notice when downloading or installing, **this is standard Android behavior for all apps installed outside the Google Play Store**:
+> - **Chrome warning ("File might be harmful"):** Tap **"Download anyway"**. Google Chrome displays this generic warning for *every* `.apk` file downloaded from the web.
+> - **Play Protect ("Unrecognized app developer"):** Tap **"More details"** &rarr; **"Install anyway"**.
+> - **100% Safe & Verified:** Teleprompter Pro is **completely open source** and requests **ZERO internet permissions** (`android.permission.INTERNET` is not even in the code). It is technically incapable of sending data, tracking you, or containing network malware.
+
 ---
 
 ## ✨ Key Features & Capabilities
@@ -70,23 +77,23 @@ Teleprompter Pro is engineered for zero-latency studio recording, ensuring that 
 ```mermaid
 graph TD
     subgraph UI_Layer ["Presentation Layer (Jetpack Compose M3)"]
-        A[EditorScreen] -->|Compose State| VM[TeleprompterViewModel]
-        B[PrompterScreen] -->|Bi-directional Scroll Control| VM
-        C[SavedScriptsScreen] -->|Search & Duplication| VM
-        D[CameraPreview] -->|Hardware PreviewView| B
+        A["EditorScreen"] -->|Compose State| VM["TeleprompterViewModel"]
+        B["PrompterScreen"] -->|Bi-directional Scroll Control| VM
+        C["SavedScriptsScreen"] -->|Search & Duplication| VM
+        D["CameraPreview"] -->|Hardware PreviewView| B
     end
 
     subgraph Hardware_Pipeline ["Camera & Media Engine"]
-        VM -->|Lifecycle Binding| CR[VideoRecorderManager]
+        VM -->|Lifecycle Binding| CR["VideoRecorderManager"]
         D -.->|Surface Provider| CR
-        CR -->|CameraX Pipeline| CAM[Device Camera / Mic]
+        CR -->|CameraX Pipeline| CAM["Device Camera & Mic"]
         CR -->|Android MediaStore API| STR["Local Storage: Movies/TeleprompterPro<br>(Native Gallery Integration)"]
     end
 
     subgraph Data_Layer ["Local Persistence (Room SQLite + DataStore)"]
-        VM <-->|Coroutines / Flow| REP[ScriptRepository]
-        REP <-->|DAO Operations| DB[AppDatabase (Room SQLite)]
-        VM <-->|Preferences Flow| DS[SettingsManager (Jetpack DataStore)]
+        VM <-->|Coroutines / Flow| REP["ScriptRepository"]
+        REP <-->|DAO Operations| DB["AppDatabase (Room SQLite)"]
+        VM <-->|Preferences Flow| DS["SettingsManager (Jetpack DataStore)"]
     end
 ```
 
